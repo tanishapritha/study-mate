@@ -1,0 +1,236 @@
+/* Global Styles */
+body {
+    font-family: 'Inter', sans-serif;
+    margin: 0;
+    background: #0B0D17; /* deep dark background */
+    color: #E0E0E0;
+}
+
+/* Dashboard Layout */
+.dashboard {
+    display: flex;
+    height: 100vh;
+}
+
+/* Sidebar */
+.sidebar {
+    width: 260px;
+    background: linear-gradient(180deg, #0D1117, #1A1F2B);
+    color: #fff;
+    padding: 40px 20px;
+    display: flex;
+    flex-direction: column;
+    border-radius: 0 30px 30px 0;
+}
+
+.sidebar-header h2 {
+    font-weight: 700;
+    font-size: 2rem;
+    margin-bottom: 50px;
+    text-align: center;
+    letter-spacing: 1px;
+    color: #00FFF7; /* neon cyan */
+}
+
+.sidebar-nav {
+    list-style: none;
+    padding: 0;
+}
+
+.sidebar-nav li {
+    display: flex;
+    align-items: center;
+    padding: 18px 12px;
+    cursor: pointer;
+    font-weight: 600;
+    border-radius: 12px;
+    margin-bottom: 12px;
+    transition: all 0.3s ease;
+    font-size: 1.05rem;
+}
+
+.sidebar-nav li i {
+    margin-right: 15px;
+    font-size: 1.2rem;
+    color: #00FFF7;
+}
+
+.sidebar-nav li:hover {
+    background-color: rgba(0, 255, 247, 0.1);
+    transform: translateX(5px);
+}
+
+/* Main Content */
+.main-content {
+    flex: 1;
+    padding: 50px 40px;
+    overflow-y: auto;
+    background: #0B0D17;
+}
+
+/* Sections */
+.section {
+    display: none;
+}
+
+.section.active {
+    display: block;
+}
+
+h1 {
+    font-weight: 700;
+    color: #00FFF7; /* neon cyan */
+    margin-bottom: 25px;
+    font-size: 2rem;
+}
+
+/* Card Design - calm, dark, no hover lifts */
+.card {
+    background: #1A1F2B;
+    padding: 30px;
+    border-radius: 20px;
+    margin-bottom: 40px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.4);
+}
+
+/* Inputs */
+textarea, input[type=text] {
+    width: 100%;
+    padding: 18px;
+    margin-bottom: 20px;
+    border-radius: 15px;
+    border: 1px solid #333;
+    font-size: 1rem;
+    font-family: 'Roboto Mono', monospace;
+    background: #121622;
+    color: #E0E0E0;
+    transition: all 0.3s ease;
+}
+
+textarea:focus, input[type=text]:focus {
+    outline: none;
+    border-color: #00FFF7;
+    box-shadow: 0 0 15px rgba(0,255,247,0.2);
+}
+
+/* Buttons */
+button.btn-primary {
+    background: linear-gradient(135deg, #00FFF7, #0D6EFD);
+    color: #0B0D17;
+    padding: 15px 30px;
+    border: none;
+    border-radius: 15px;
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 1rem;
+    box-shadow: 0 6px 15px rgba(0,255,247,0.2);
+    transition: all 0.3s ease;
+}
+
+button.btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(0,255,247,0.4);
+}
+
+/* Output Cards */
+.output-card {
+    background: #121622;
+    padding: 25px;
+    border-radius: 15px;
+    margin-top: 25px;
+    white-space: pre-wrap;
+    font-size: 1rem;
+    font-family: 'Roboto Mono', monospace;
+    line-height: 1.6;
+    box-shadow: inset 0 2px 8px rgba(0,0,0,0.5);
+}
+
+/* Flashcards & Quiz Items */
+.output-card .card-item {
+    background-color: #1A1F2B;
+    padding: 18px;
+    margin: 15px 0;
+    border-radius: 15px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.4);
+}
+
+/* Hint Text */
+.hint {
+    font-size: 0.85rem;
+    color: #777;
+}
+
+/* Scrollbar Styling */
+.main-content::-webkit-scrollbar {
+    width: 8px;
+}
+
+.main-content::-webkit-scrollbar-track {
+    background: #0B0D17;
+}
+
+.main-content::-webkit-scrollbar-thumb {
+    background-color: #00FFF7;
+    border-radius: 10px;
+}
+
+
+/* Sidebar nav items - disabled state */
+.sidebar-nav li.disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+    position: relative;
+}
+
+/* Tooltip appears to the left of the nav item */
+.sidebar-nav li.disabled:hover::after {
+    content: "Upload notes first";
+    position: absolute;
+    right: calc(5px);   /* Slight gap to the left */
+    top: 50%;
+    transform: translateY(-50%);
+    background: #00FFF7;
+    color: #0B0D17;
+    padding: 5px 10px;
+    border-radius: 8px;
+    font-size: 0.8rem;
+    white-space: nowrap;
+    box-shadow: 0 2px 8px rgba(0,255,247,0.4);
+    pointer-events: none;
+    z-index: 1000;              /* Ensure it appears above content */
+}
+
+
+/* Make summary output card larger */
+#summaryResult {
+    min-height: 400px; /* larger by default */
+    font-size: 1.1rem;
+    padding: 30px;
+    border-radius: 20px;
+    box-shadow: inset 0 4px 12px rgba(0,0,0,0.6);
+    background: #121622;
+    white-space: pre-wrap;
+    margin-top: 20px;
+}
+
+/* Push Download button further below summary output */
+#summary .btn-primary.download-btn {
+    margin-top: 40px; /* increased spacing from the summary card */
+    padding: 12px 24px;
+    font-size: 0.95rem;
+    border-radius: 12px;
+}
+
+
+/* Optional: smaller button size for a cleaner look */
+button.btn-primary.download-btn {
+    padding: 12px 24px;
+    font-size: 0.95rem;
+    border-radius: 12px;
+}
+
+/* Space the download button nicely below the card */
+.download-container {
+    margin-top: 30px; /* adds space between card and button */
+    text-align: left; /* align button with content */
+}

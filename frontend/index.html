@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI StudyMate Dashboard</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Roboto+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
+</head>
+<body>
+    <div class="dashboard">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <h2>📘 StudyMate</h2>
+            </div>
+            <ul class="sidebar-nav">
+                <li onclick="showSection('upload')"><i class="fa fa-upload"></i> Upload Notes</li>
+                <li class="disabled" onclick="showSection('summary')"><i class="fa fa-list-alt"></i> Summary</li>
+                <li class="disabled" onclick="showSection('flashcards')"><i class="fa fa-clone"></i> Flashcards</li>
+                <li class="disabled" onclick="showSection('qa')"><i class="fa fa-question-circle"></i> Q&A</li>
+                <li class="disabled" onclick="showSection('quiz')"><i class="fa fa-graduation-cap"></i> Quiz</li>
+            </ul>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Upload Notes (mandatory first) -->
+            <section id="upload" class="section active">
+                <h1>Upload Your Notes</h1>
+                <div class="card">
+                    <textarea id="manualText" placeholder="Paste your notes here..."></textarea>
+                    <input type="file" id="fileUpload" accept=".pdf,.txt" />
+                    <p class="hint">Supported formats: PDF, TXT</p>
+                    <button class="btn-primary" onclick="enableSections()">Upload & Continue</button>
+                </div>
+            </section>
+
+            <!-- Optional Sections (disabled until upload) -->
+            <div id="contentSections" style="display:none;">
+                
+
+                <section id="summary" class="section tab-section active">
+                    <div class="card">
+                        <button onclick="generateSummary()" class="btn-primary">Generate Summary</button>
+                        <div id="summaryResult" class="output-card"></div>
+                        <button class="btn-primary" onclick="downloadPDF()">Download Notes as PDF</button>
+                    </div>
+                </section>
+
+                <section id="flashcards" class="section tab-section">
+                    <div class="card">
+                        <button onclick="generateFlashcards()" class="btn-primary">Generate Flashcards</button>
+                        <div id="flashcardsResult" class="output-card"></div>
+                    </div>
+                </section>
+
+                <section id="qa" class="section tab-section">
+                    <div class="card">
+                        <input type="text" id="userQuestion" placeholder="Type your question here..."/>
+                        <button onclick="askQuestion()" class="btn-primary">Get Answer</button>
+                        <div id="qaResult" class="output-card"></div>
+                    </div>
+                </section>
+
+                <section id="quiz" class="section tab-section">
+                    <div class="card">
+                        <button onclick="generateQuiz()" class="btn-primary">Generate Quiz</button>
+                        <div id="quizResult" class="output-card"></div>
+                    </div>
+                </section>
+            </div>
+        </main>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>

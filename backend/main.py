@@ -5,18 +5,18 @@ import pdfplumber
 import os
 from dotenv import load_dotenv
 
-# Load environment variables
+
 load_dotenv()
 
-# Initialize OpenRouter client
+
 client = OpenAI(
-    base_url="https://openrouter.ai/api/v1",          # OpenRouter endpoint
-    api_key=os.getenv("OPENROUTER_API_KEY")           # Use OpenRouter API key from .env
+    base_url="https://openrouter.ai/api/v1",          # OpenRouter
+    api_key=os.getenv("OPENROUTER_API_KEY")           
 )
 
 app = FastAPI(title="AI Study Assistant API")
 
-# Allow frontend to communicate
+
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -39,13 +39,13 @@ def extract_text(file: UploadFile):
         return file.file.read().decode("utf-8")
     return ""
 
-# Endpoint: Generate Summary
+# Summary
 @app.post("/summary")
 async def generate_summary(text: str = Form(...), file: UploadFile = File(None)):
     if file:
         text = extract_text(file)
     response = client.chat.completions.create(
-        model="gpt-4.1-mini",  # OpenRouter model
+        model="gpt-4.1-mini",  
         messages=[
             {"role": "system", "content": "You are a helpful study assistant."},
             {"role": "user", "content": f"Summarize this text in 5 key points for study purposes:\n\n{text}"}
@@ -55,7 +55,7 @@ async def generate_summary(text: str = Form(...), file: UploadFile = File(None))
     )
     return {"summary": response.choices[0].message.content}
 
-# Endpoint: Generate Flashcards
+# Flashcards
 @app.post("/flashcards")
 async def generate_flashcards(text: str = Form(...)):
     response = client.chat.completions.create(
@@ -69,7 +69,7 @@ async def generate_flashcards(text: str = Form(...)):
     )
     return {"flashcards": response.choices[0].message.content}
 
-# Endpoint: Q&A
+# Q&A
 @app.post("/qa")
 async def ask_question(text: str = Form(...), question: str = Form(...)):
     response = client.chat.completions.create(
@@ -83,7 +83,7 @@ async def ask_question(text: str = Form(...), question: str = Form(...)):
     )
     return {"answer": response.choices[0].message.content}
 
-# Endpoint: Quiz
+# Quiz
 @app.post("/quiz")
 async def generate_quiz(text: str = Form(...)):
     response = client.chat.completions.create(

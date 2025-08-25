@@ -11,7 +11,7 @@ load_dotenv()
 
 # Initialize OpenAI client for OpenRouter
 client = OpenAI(
-    api_key=os.getenv("OPENROUTER_API_KEY"),     # Do NOT pass proxies
+    api_key=os.getenv("OPENROUTER_API_KEY"),
     base_url="https://openrouter.ai/api/v1"
 )
 
@@ -25,99 +25,67 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-def extract_text(file: UploadFile):
-    if file.content_type == "application/pdf":
-        file_bytes = file.file.read()
-        pdf = pdfplumber.open(io.BytesIO(file_bytes))
-        text = "\n".join([page.extract_text() or "" for page in pdf.pages])
-        return text
-    elif file.content_type == "text/plain":
+def extract_text(file: UploadFile) -> str:
+    try:
         file.file.seek(0)
-        return file.file.read().decode("utf-8")
-    return ""
+        if file.content_type == "application/pdf":
+            pdf = pdfplumber.open(io.BytesIO(file.file.read()))
+            text = "\n".join([page.extract_text() or "" for page in pdf.pages])
+            return text
+        elif file.content_type == "text/plain":
+            return file.file.read().decode("utf-8")
+        else:
+            return ""
+    except Exception as e:
+        print(f"Error reading file: {e}")
+        return ""
 
-# Summary
+def generate_response(prompt: str, max_tokens: int = 500):
+    try:
+        response = client.chat.completions.create(
+            model="gpt-4.1-mini",
+            messages=[
+                {"role": "system", "content": "You are a helpful study assistant."},
+                {"role": "user", "content": prompt}
+            ],
+            temperature=0.5,
+            max_tokens=max_tokens
+        )
+        return response.choices[0].message.content
+    except Exception as e:
+        print(f"OpenAI API error: {e}")
+        return None
+
 @app.post("/summary")
 async def generate_summary(text: str = Form(...), file: UploadFile = File(None)):
-    try:
-        if file:
-            text = extract_text(file)
-        response = client.chat.completions.create(
-            model="gpt-4.1-mini",
-            messages=[
-                {"role": "system", "content": "You are a helpful study assistant."},
-                {"role": "user", "content": f"Summarize this text in 5 key points:\n\n{text}"}
-            ],
-            temperature=0.5,
-            max_tokens=300
-        )
-        return {"summary": response.choices[0].message.content}
-    except Exception as e:
-        print("Error generating summary:", str(e))
-        return JSONResponse(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            content={"error": "Failed to generate summary. Please try again later."}
-        )
+    if file:
+        text = extract_text(file)
+    result = generate_response(f"Summarize this text in 5 key points:\n\n{text}", max_tokens=300)
+    if result is None:
+        return JSONResponse(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                            content={"error": "Failed to generate summary."})
+    return {"summary": result}
 
-# Flashcards
 @app.post("/flashcards")
 async def generate_flashcards(text: str = Form(...)):
-    try:
-        response = client.chat.completions.create(
-            model="gpt-4.1-mini",
-            messages=[
-                {"role": "system", "content": "You are a helpful study assistant."},
-                {"role": "user", "content": f"Convert this text into 10 flashcards in question-answer format:\n\n{text}"}
-            ],
-            temperature=0.5,
-            max_tokens=500
-        )
-        return {"flashcards": response.choices[0].message.content}
-    except Exception as e:
-        print("Error generating flashcards:", str(e))
-        return JSONResponse(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            content={"error": "Failed to generate flashcards. Please try again later."}
-        )
+    result = generate_response(f"Convert this text into 10 flashcards in question-answer format:\n\n{text}", max_tokens=500)
+    if result is None:
+        return JSONResponse(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                            content={"error": "Failed to generate flashcards."})
+    return {"flashcards": result}
 
-# Q&A
 @app.post("/qa")
 async def ask_question(text: str = Form(...), question: str = Form(...)):
-    try:
-        response = client.chat.completions.create(
-            model="gpt-4.1-mini",
-            messages=[
-                {"role": "system", "content": "You are a helpful study assistant."},
-                {"role": "user", "content": f"Answer the question based on these notes:\n\n{text}\n\nQuestion: {question}"}
-            ],
-            temperature=0.5,
-            max_tokens=300
-        )
-        return {"answer": response.choices[0].message.content}
-    except Exception as e:
-        print("Error answering question:", str(e))
-        return JSONResponse(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            content={"error": "Failed to answer question. Please try again later."}
-        )
+    result = generate_response(f"Answer the question based on these notes:\n\n{text}\n\nQuestion: {question}", max_tokens=300)
+    if result is None:
+        return JSONResponse(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                            content={"error": "Failed to answer question."})
+    return {"answer": result}
 
-# Quiz
 @app.post("/quiz")
 async def generate_quiz(text: str = Form(...)):
-    try:
-        response = client.chat.completions.create(
-            model="gpt-4.1-mini",
-            messages=[
-                {"role": "system", "content": "You are a helpful study assistant."},
-                {"role": "user", "content": f"Create 5 multiple-choice questions based on these notes. Provide 4 options each, mark the correct answer:\n\n{text}"}
-            ],
-            temperature=0.5,
-            max_tokens=500
-        )
-        return {"quiz": response.choices[0].message.content}
-    except Exception as e:
-        print("Error generating quiz:", str(e))
-        return JSONResponse(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            content={"error": "Failed to generate quiz. Please try again later."}
-        )
+    result = generate_response(f"Create 5 multiple-choice questions based on these notes. Provide 4 options each, mark the correct answer:\n\n{text}", max_tokens=500)
+    if result is None:
+        return JSONResponse(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                            content={"error": "Failed to generate quiz."})
+    return {"quiz": result}

@@ -1,4 +1,5 @@
 let notesUploaded = false;
+const BASE_URL = 'https://study-mate-ns25.onrender.com'; // Render backend URL
 
 // Show main section (via sidebar)
 function showSection(sectionId){
@@ -29,11 +30,9 @@ function enableSections(){
     // Remove disabled class from sidebar items
     document.querySelectorAll('.sidebar-nav li.disabled').forEach(li => li.classList.remove('disabled'));
 
-    // Automatically switch to Summary section instead of alert
-    document.querySelectorAll('.section').forEach(sec => sec.classList.remove('active'));
-    document.getElementById('summary').classList.add('active');
+    // Automatically switch to Summary section
+    showTab('summary');
 }
-
 
 // Tab switching inside main content
 function showTab(tabId){
@@ -55,7 +54,7 @@ async function generateSummary(){
     const formData = new FormData();
     formData.append('text', text);
 
-    const res = await fetch('http://localhost:8000/summary', {method:'POST', body:formData});
+    const res = await fetch(`${BASE_URL}/summary`, {method:'POST', body:formData});
     const data = await res.json();
     document.getElementById('summaryResult').innerText = data.summary;
 }
@@ -65,7 +64,7 @@ async function generateFlashcards(){
     const formData = new FormData();
     formData.append('text', text);
 
-    const res = await fetch('http://localhost:8000/flashcards', {method:'POST', body:formData});
+    const res = await fetch(`${BASE_URL}/flashcards`, {method:'POST', body:formData});
     const data = await res.json();
 
     const container = document.getElementById('flashcardsResult');
@@ -87,7 +86,7 @@ async function askQuestion(){
     formData.append('text', text);
     formData.append('question', question);
 
-    const res = await fetch('http://localhost:8000/qa', {method:'POST', body:formData});
+    const res = await fetch(`${BASE_URL}/qa`, {method:'POST', body:formData});
     const data = await res.json();
     document.getElementById('qaResult').innerText = data.answer;
 }
@@ -97,7 +96,7 @@ async function generateQuiz(){
     const formData = new FormData();
     formData.append('text', text);
 
-    const res = await fetch('http://localhost:8000/quiz', {method:'POST', body:formData});
+    const res = await fetch(`${BASE_URL}/quiz`, {method:'POST', body:formData});
     const data = await res.json();
 
     const container = document.getElementById('quizResult');
@@ -112,18 +111,13 @@ async function generateQuiz(){
     });
 }
 
-
+// Download notes as PDF
 function downloadPDF() {
     const { jsPDF } = window.jspdf;
     const doc = new jsPDF();
 
-    // Get the text from the notes textarea
     const text = document.getElementById('manualText').value || "No notes available.";
-
-    // Split text into lines for PDF
-    const lines = doc.splitTextToSize(text, 180); // 180mm page width approx
-    doc.text(lines, 15, 20); // starting at x=15, y=20
-
-    // Save the PDF
+    const lines = doc.splitTextToSize(text, 180);
+    doc.text(lines, 15, 20);
     doc.save("StudyNotes.pdf");
 }
